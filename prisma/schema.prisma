@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String   @default("")
+  color       String   @default("#00f0ff")
+  imageUrl    String   @default("")
+  createdAt   DateTime @default(now())
+  posts       Post[]
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String
+  downloadUrl String
+  buttonText  String   @default("Download")
+  buttonColor String   @default("#00f0ff")
+  buttonLink  String   @default("")
+  warning     String   @default("")
+  isVisible   Boolean  @default(true)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model SiteSettings {
+  id          String @id @default("main")
+  siteName    String @default("Official FF Community")
+  description String @default("Your ultimate file-sharing hub. Browse, discover, and download files across multiple categories.")
+  logoUrl     String @default("")
+}
+
+model BottomButton {
+  id        String   @id @default(cuid())
+  name      String
+  icon      String   @default("⭐")
+  link      String   @default("")
+  color     String   @default("#00f0ff")
+  textColor String   @default("#ffffff")
+  bgColor   String   @default("#1a1b2e")
+  sortOrder Int      @default(0)
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
