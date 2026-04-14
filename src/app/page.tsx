@@ -117,7 +117,7 @@ export default function App() {
 
   // ─── API ─────────────────────────────────────────────────
   const fetchCategories = useCallback(async () => {
-    try { const r = await fetch('/api/categories'); const d = await r.json(); setCategories(Array.isArray(d) ? d : []); } catch { /* */ }
+    try { const r = await fetch('/api/categories'); if (!r.ok) { setCategories([]); return; } const d = await r.json(); setCategories(Array.isArray(d) ? d : []); } catch { setCategories([]); }
   }, []);
 
   const fetchPosts = useCallback(async (p?: { slug?: string; search?: string; admin?: boolean }) => {
@@ -127,7 +127,7 @@ export default function App() {
       if (p?.slug) u += `slug=${p.slug}`;
       if (p?.search) u += `&search=${encodeURIComponent(p.search)}`;
       if (p?.admin) u += '&admin=true';
-      const r = await fetch(u); const d = await r.json();
+      const r = await fetch(u); if (!r.ok) { setPosts([]); return; } const d = await r.json();
       setPosts(Array.isArray(d) ? d : []);
     } catch { setPosts([]); }
     finally { setIsLoading(false); }
@@ -151,9 +151,10 @@ export default function App() {
   const fetchBottomButtons = useCallback(async (admin?: boolean) => {
     try {
       const r = await fetch(`/api/bottom-buttons${admin ? '?admin=true' : ''}`);
+      if (!r.ok) { setBottomButtons([]); return; }
       const d = await r.json();
       setBottomButtons(Array.isArray(d) ? d : []);
-    } catch { /* */ }
+    } catch { setBottomButtons([]); }
   }, []);
 
   // Load data on mount
